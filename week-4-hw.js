@@ -9,7 +9,7 @@ var enterInfo = document.getElementById("hs-text").style.visibility = "hidden";
 var highscores = document.getElementById("hScores");
 var scoreList = [];
 var currentScore = 0;
-var timeLeft = 90;
+var timeLeft = 60;
 
 var Questions = [
     {title: "What ancient cilization built the Machu Picchu complex in Peru?",
@@ -54,11 +54,11 @@ function getQuestion() {
 
 function choiceSelect() {
     if(this.value !== Questions[currentQuestionIndex].correctAnswer) {
-        timeLeft -= 10;
+        timeLeft -= 5;
         result.textContent = "Incorrect";
     }
     else {
-        currentScore += 10;
+        currentScore += 5;
         result.textContent = "You got it right!";
     }
     currentQuestionIndex ++;
@@ -85,7 +85,7 @@ function startTimer() {
             clearInterval(timeInterval);
             gameOver();
         }
-    }, 1000);
+    }, 500);
 };
 
 function gameOver() {
