@@ -1,26 +1,15 @@
 var main = document.getElementById("main");
-
 var header = document.getElementById("header");
-
 var content = document.getElementById("content");
-
 var startButton = document.getElementById("startButton");
-
 var timer = document.getElementById("timer");
-
 var score = document.getElementById("score");
-
 var result = document.getElementById("result");
-
 var enterInfo = document.getElementById("hs-text").style.visibility = "hidden";
-
 var highscores = document.getElementById("hScores");
-
 var scoreList = [];
-
 var currentScore = 0;
-
-var timeLeft = 120;
+var timeLeft = 90;
 
 var Questions = [
     {title: "What ancient cilization built the Machu Picchu complex in Peru?",
@@ -66,7 +55,7 @@ function getQuestion() {
 function choiceSelect() {
     if(this.value !== Questions[currentQuestionIndex].correctAnswer) {
         timeLeft -= 10;
-        result.textContent = "Incorrect :(";
+        result.textContent = "Incorrect";
     }
     else {
         currentScore += 10;
@@ -103,7 +92,7 @@ function gameOver() {
     result.textContent = "";
     timer.textContent = "";
     header.textContent = "GAME OVER!";
-    content.textContent = "Submit your score and initials! ";
+    content.textContent = "Initials for your score";
     score.textContent = "Your score: " + currentScore;
     showform()
 };
