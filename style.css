@@ -1,6 +1,10 @@
 *{align-items: center;
 text-align: center;}
 
-#highScoreButton {
-    align-content: initial;
+.left {
+    float:left;
+}
+
+.right {
+    float:right;
 }

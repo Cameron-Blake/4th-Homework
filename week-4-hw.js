@@ -1,136 +1,140 @@
-var main = document.getElementById("main");
-var header = document.getElementById("header");
-var content = document.getElementById("content");
-var startButton = document.getElementById("startButton");
-var timer = document.getElementById("timer");
-var score = document.getElementById("score");
-var result = document.getElementById("result");
-var enterInfo = document.getElementById("hs-text").style.visibility = "hidden";
-var highscores = document.getElementById("hScores");
-var scoreList = [];
-var currentScore = 0;
-var timeLeft = 60;
+var questions = [{
+    title: "Arrays in Javascript can be used to store?",
+    choices: ["numbers and strings", "other arrays", "booleans", "all of the above"],
+    answer: "all of the above"
+},
+{
+    title: "Commonly used data types DO NOT include:",
+    choices: ["Strings", "Booleans", "Alerts", "Numbers"],
+    answer: "Alerts"
+},
+{
+    title: "The condition in an if/else statement is enclosed within ____.",
+    choices: ["quotes", "curly brackets", "paranethesis", "square brackets"],
+    answer: "curly brackets"
+},
+{
+    title: "A very useful tool used during developement and debugging for printing content to the debugger is:",
+    choices: ["Javascript", "for loops", "terminal and bash", "console log"],
+    answer: "console log"
+},
+{
+}
+]
 
-var Questions = [
-    {title: "What ancient cilization built the Machu Picchu complex in Peru?",
-    choices: ["A: The Mayans", "B: The Incas", "C: The Olmecs", "D: The Aztecs"],
-    correctAnswer: "B: The Incas",
-    },
-    {title: "What type of word is 'truthfully'?",
-    choices: ["A: Adverb", "B: Adjective", "C: Interjection", "D: Article"],
-    correctAnswer: "A: Adverb",
-    },
-    {title: "What is the longest river in the world?",
-    choices: ["A: Yangtze", "B: Mississippi", "C: Amazon", "D: Nile"],
-    correctAnswer: "D: Nile",
-    },
-    {title: "What planet is nicknamed the 'Red Planet'?",
-    choices: ["A: Mercury", "B: Venus", "C: Mars", "D: Jupiter"],
-    correctAnswer: "C: Mars",
-    },
-    {title: "The interior angles of a triangle always sum up to ____ :",
-    choices: ["A: 90 degrees", "B: 60 degrees", "C: 75 degrees", "D: 180 degrees"],
-    correctAnswer: "D: 180 degrees",
-    }]
+var score = 0;
+var currentQuestion = -1;
+var timeLeft = 0;
+var timer;
 
-var currentQuestionIndex = 0;
+function start() {
 
-function getQuestion() {
-    content.textContent = "";
-    result.textContent = "";
-    var currentQuestion = Questions[currentQuestionIndex];
-    header.textContent = currentQuestion.title;
-    score.textContent = currentScore;
-    timer.textContent = timeLeft;
+timeLeft = 60;
+document.getElementById("timeLeft").innerHTML = timeLeft;
 
-    for (var i = 0; i < currentQuestion.choices.length; i++) {
-        var choiceButton = document.createElement("button");
-        choiceButton.setAttribute("value", currentQuestion.choices[i]);
-        choiceButton.textContent = currentQuestion.choices[i];
-        choiceButton.onclick = choiceSelect;
-        content.appendChild(choiceButton);
+timer = setInterval(function() {
+    timeLeft--;
+    document.getElementById("timeLeft").innerHTML = timeLeft;
+    if (timeLeft <= 0) {
+        clearInterval(timer);
+        endGame(); 
     }
+}, 1000);
+
+next();
 }
 
-function choiceSelect() {
-    if(this.value !== Questions[currentQuestionIndex].correctAnswer) {
-        timeLeft -= 5;
-        result.textContent = "Incorrect";
+function endGame() {
+clearInterval(timer);
+
+var quizContent = `
+<h2>Game over!</h2>
+<h3>You got a ` + score +  ` /100!</h3>
+<h3>That means you got ` + score / 25 +  ` questions correct!</h3>
+<input type="text" id="name" placeholder="First name"> 
+<button onclick="setScore()">Set score!</button>`;
+
+document.getElementById("quizBody").innerHTML = quizContent;
+}
+
+function setScore() {
+localStorage.setItem("highscore", score);
+localStorage.setItem("highscoreName",  document.getElementById('name').value);
+getScore();
+}
+
+
+function getScore() {
+var quizContent = `
+<h2>` + localStorage.getItem("highscoreName") + `'s highscore is:</h2>
+<h1>` + localStorage.getItem("highscore") + `</h1><br> 
+
+<button onclick="clearScore()">Clear score!</button><button onclick="resetGame()">Play Again!</button>
+
+`;
+
+document.getElementById("quizBody").innerHTML = quizContent;
+}
+
+function clearScore() {
+localStorage.setItem("highscore", "");
+localStorage.setItem("highscoreName",  "");
+
+resetGame();
+}
+
+function resetGame() {
+clearInterval(timer);
+score = 0;
+currentQuestion = -1;
+timeLeft = 0;
+timer = null;
+
+document.getElementById("timeLeft").innerHTML = timeLeft;
+
+var quizContent = `
+<h1>
+    JavaScript Quiz!
+</h1>
+<h3>
+    Click to play!   
+</h3>
+<button onclick="start()">Start!</button>`;
+
+document.getElementById("quizBody").innerHTML = quizContent;
+}
+
+function incorrect() {
+timeLeft -= 10; 
+next();
+}
+
+function correct() {
+score += 25;
+next();
+}
+
+function next() {
+currentQuestion++;
+
+if (currentQuestion > questions.length - 1) {
+    endGame();
+    return;
+}
+
+var quizContent = "<h2>" + questions[currentQuestion].title + "</h2>"
+
+for (var i = 0; i < questions[currentQuestion].choices.length; i++) {
+    var buttonCode = "<button onclick=\"[ANS]\">[CHOICE]</button>"; 
+    buttonCode = buttonCode.replace("[CHOICE]", questions[currentQuestion].choices[i]);
+    if (questions[currentQuestion].choices[i] == questions[currentQuestion].answer) {
+        buttonCode = buttonCode.replace("[ANS]", "correct()");
+    } else {
+        buttonCode = buttonCode.replace("[ANS]", "incorrect()");
     }
-    else {
-        currentScore += 5;
-        result.textContent = "You got it right!";
-    }
-    currentQuestionIndex ++;
-    if(currentQuestionIndex === Questions.length) {
-        gameOver();
-    }
-    else {
-        getQuestion();
-    }
-};
+    quizContent += buttonCode
+}
 
-function startTimer() {
-    var timeInterval = setInterval(function() {
-        timer.textContent = timeLeft + " seconds remaining";
-        timeLeft--;
 
-        if (timeLeft === 0) {
-            timer.textContent = "TIME'S UP!";
-            clearInterval(timeInterval);
-            gameOver();
-        }
-        else if (currentQuestionIndex === Questions.length) {
-            timer.content = "";
-            clearInterval(timeInterval);
-            gameOver();
-        }
-    }, 500);
-};
-
-function gameOver() {
-    result.textContent = "";
-    timer.textContent = "";
-    header.textContent = "GAME OVER!";
-    content.textContent = "Initials for your score";
-    score.textContent = "Your score: " + currentScore;
-    showform()
-};
-
-function renderscores() {
-    for (var i=0; i < scoreList.length; i++) {
-        var newScore = scoreList[i];
-
-        var li = document.createElement("li");
-        li.textContent = newScore;
-        li.setAttribute("data-index", i);
-        highscores.appendChild(li);
-    };
-};
-
-var sbutton = document.createElement("button");
-sbutton.textContent = "Submit";
-highscores.append(sbutton);
-sbutton.addEventListener("submit", function(event) {
-    event.preventDefault();
-
-    var highscoretext = highscores.value.trim();
-
-    if (highscoretext === "") {
-        return;
-    };
-
-    scoreList.push(highscoretext);
-    enterInfo.value = "";
-});
-
-function showform() {
-    document.getElementById("hs-text").style.visibility = "visible";
-    
-};
-
-startButton.addEventListener("click", function() {
-    content.textContent = "";
-    getQuestion();
-    startTimer();    
-});
+document.getElementById("quizBody").innerHTML = quizContent;
+}
