@@ -108,24 +108,25 @@ function renderscores() {
     };
 };
 
+var sbutton = document.createElement("button");
+sbutton.textContent = "Submit";
+highscores.append(sbutton);
+sbutton.addEventListener("submit", function(event) {
+    event.preventDefault();
+
+    var highscoretext = highscores.value.trim();
+
+    if (highscoretext === "") {
+        return;
+    };
+
+    scoreList.push(highscoretext);
+    enterInfo.value = "";
+});
+
 function showform() {
     document.getElementById("hs-text").style.visibility = "visible";
     
-    var sbutton = document.createElement("button");
-    sbutton.textContent = "Submit";
-    highscores.appendChild(sbutton);
-    sbutton.addEventListener("submit", function(event) {
-        event.preventDefault();
-
-        var highscoretext = highscores.value.trim();
-
-        if (highscoretext === "") {
-            return;
-        };
-
-        scoreList.push(highscoretext);
-        enterInfo.value = "";
-    });
 };
 
 startButton.addEventListener("click", function() {
