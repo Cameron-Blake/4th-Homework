@@ -1,156 +1,146 @@
-var startBtn = document.getElementById("startBtn");
-var submitBtn = document.querySelector("button.submitBtn")
-var secondsLeft = (questions.length * 20 + 1);
-var timerElement = document.getElementById("timer");
-var submitScoreElement = document.querySelector("#submit-score");
-var userScoreElement = document.getElementById("user-score");
-var userNameInput;
-var questionHead = document.getElementById("questions");
-var answerChoices = document.getElementById("answers");
+var main = document.getElementById("main");
 
-var questionNumber = -1;
-var answer;
-var questions = [
-    {
-        title: "This mushroom is also known as Fly Agaric",
-        choices: ["Amanita ocreata", "Amanita cokerii", "Amanita muscaria", "Amanita daucipes"],
-        answer: "Amanita muscaria"
+var header = document.getElementById("header");
+
+var content = document.getElementById("content");
+
+var startButton = document.getElementById("startButton");
+
+var timer = document.getElementById("timer");
+
+var score = document.getElementById("score");
+
+var result = document.getElementById("result");
+
+var enterInfo = document.getElementById("hs-text").style.visibility = "hidden";
+
+var highscores = document.getElementById("hScores");
+
+var scoreList = [];
+
+var currentScore = 0;
+
+var timeLeft = 120;
+
+var Questions = [
+    {title: "What ancient cilization built the Machu Picchu complex in Peru?",
+    choices: ["A: The Mayans", "B: The Incas", "C: The Olmecs", "D: The Aztecs"],
+    correctAnswer: "B: The Incas",
     },
-
-    {
-        title: "Which of the following is a common name of Grifola frondosa?",
-        choices: ["Hen of the Woods", "Chariot of Fire", "Griffey's Polypore", "Frondulous maximus"],
-        answer: "Hen of the Woods"
+    {title: "What type of word is 'truthfully'?",
+    choices: ["A: Adverb", "B: Adjective", "C: Interjection", "D: Article"],
+    correctAnswer: "A: Adverb",
     },
-
-    {
-        title: "This edible mushroom is prized for it's delicious flavor",
-        choices: ["Amanita bisporigera", "Galerina marginata", "Morchella escuelenta", "Gravidex hombrii"],
-        answer: "Morchella escuelenta"
+    {title: "What is the longest river in the world?",
+    choices: ["A: Yangtze", "B: Mississippi", "C: Amazon", "D: Nile"],
+    correctAnswer: "D: Nile",
     },
-
-    {
-        title: "The scientific name for a mushroom's stem is:",
-        choices: ["Stipe", "Stripe", "Stem", "Stipple"],
-        answer: "Stipe"
+    {title: "What planet is nicknamed the 'Red Planet'?",
+    choices: ["A: Mercury", "B: Venus", "C: Mars", "D: Jupiter"],
+    correctAnswer: "C: Mars",
     },
+    {title: "The interior angles of a triangle always sum up to ____ :",
+    choices: ["A: 90 degrees", "B: 60 degrees", "C: 75 degrees", "D: 180 degrees"],
+    correctAnswer: "D: 180 degrees",
+    }]
 
-    {
-        title: "This mushroom is known as the Chanterelle",
-        choices: ["Helvella", "Cantharellus", "Craterellus", "Laetiporus"],
-        answer: "Cantharellus"
-    },
+var currentQuestionIndex = 0;
 
-    {
-        title: "The mushroom once dubbed 'Psilocybe weilii' is actually which fairly widespread Psilocybe?",
-        choices: ["Psilocybe heimii", "Psilocybe fanaticus", "Psilocybe semilanceata", "Psilocybe caerulescens"],
-        answer: "Psilocybe caerulescens"
-    },
+function getQuestion() {
+    content.textContent = "";
+    result.textContent = "";
+    var currentQuestion = Questions[currentQuestionIndex];
+    header.textContent = currentQuestion.title;
+    score.textContent = currentScore;
+    timer.textContent = timeLeft;
 
-
-];
-
-
-
-function startTimer() {
- 
-    document.getElementById("home").classList.add('d-none');
-    document.getElementById("quiz").classList.remove('d-none');
-
-    // timer set and begins 120 second countdown
-    setTimer();
-
-    // create questions to display
-    makeQuestions();
-}
-
-function setTimer() {
-
-    var countdown = setInterval(function () {
-        secondsLeft--;
-        timerElement.textContent = "Time: " + secondsLeft;
-
-        if (secondsLeft === 0 || questionNumber === questions.length) {
-            clearInterval(countdown);
-            setTimeout(displayScore, 500);
-        }
-    }, 1000);
-}
-
-function makeQuestions() {
-    questionNumber++;
-    answer = questions[questionNumber].answer
-
-    questionHead.textContent = questions[questionNumber].title;
-    answerChoices.innerHTML = "";
-
-    var choices = questions[questionNumber].choices;
-
-    for (var q = 0; q < choices.length; q++) {
-        var nextChoice = document.createElement("button");
-
-        nextChoice.textContent = choices[q]
-        answerBtn = answerChoices.appendChild(nextChoice).setAttribute("class", "p-3 m-1 btn btn-light btn-block");
+    for (var i = 0; i < currentQuestion.choices.length; i++) {
+        var choiceButton = document.createElement("button");
+        choiceButton.setAttribute("value", currentQuestion.choices[i]);
+        choiceButton.textContent = currentQuestion.choices[i];
+        choiceButton.onclick = choiceSelect;
+        content.appendChild(choiceButton);
     }
 }
 
-// display option to enter name to scoreboard
-function displayScore() {
-    document.getElementById("quiz").classList.add('d-none');
-    document.getElementById("submit-score").classList.remove('d-none');
-    userScoreElement.textContent = "FINAL SCORE: " + secondsLeft + ".";
-}
+function choiceSelect() {
+    if(this.value !== Questions[currentQuestionIndex].correctAnswer) {
+        timeLeft -= 10;
+        result.textContent = "Incorrect :(";
+    }
+    else {
+        currentScore += 10;
+        result.textContent = "You got it right!";
+    }
+    currentQuestionIndex ++;
+    if(currentQuestionIndex === Questions.length) {
+        gameOver();
+    }
+    else {
+        getQuestion();
+    }
+};
 
-// Event Listeners for Main Buttons
-startBtn.addEventListener("click", startTimer);
-submitBtn.addEventListener("click", function (event) {
-    event.stopPropagation();
-    addScore();
-    
-    window.location.href = './highscores.html'
-});
+function startTimer() {
+    var timeInterval = setInterval(function() {
+        timer.textContent = timeLeft + " seconds remaining";
+        timeLeft--;
 
-function addScore () {
-    userNameInput = document.getElementById("userName").value
-    
-    // create a new object with name and score keys
-var newScore = {
-        name: userNameInput,
-        score: secondsLeft
+        if (timeLeft === 0) {
+            timer.textContent = "TIME'S UP!";
+            clearInterval(timeInterval);
+            gameOver();
+        }
+        else if (currentQuestionIndex === Questions.length) {
+            timer.content = "";
+            clearInterval(timeInterval);
+            gameOver();
+        }
+    }, 1000);
+};
+
+function gameOver() {
+    result.textContent = "";
+    timer.textContent = "";
+    header.textContent = "GAME OVER!";
+    content.textContent = "Submit your score and initials! ";
+    score.textContent = "Your score: " + currentScore;
+    showform()
+};
+
+function renderscores() {
+    for (var i=0; i < scoreList.length; i++) {
+        var newScore = scoreList[i];
+
+        var li = document.createElement("li");
+        li.textContent = newScore;
+        li.setAttribute("data-index", i);
+        highscores.appendChild(li);
     };
-    // check if there are scores in local storage first and take value
-    //if not, make a blank array
-    var highScores = JSON.parse(localStorage.getItem("highScores") || "[]");
-    // push object into score array
-    highScores.push(newScore)
-    // turn objects into an array of strings + put it into local storage
-    localStorage.setItem("highScores", JSON.stringify(highScores));
-}
+};
 
-function hideFeedback(){
-    var pElement = document.getElementsByClassName("feedback")[0]
-    pElement.style.display='none'
-}
-
-function showFeedback(){
-    var pElement = document.getElementsByClassName("feedback")[0]
-    pElement.removeAttribute('style');
-}
-
-answerChoices.addEventListener("click", function (event) {
-    var pElement = document.getElementsByClassName("feedback")[0]
+function showform() {
+    document.getElementById("hs-text").style.visibility = "visible";
     
-    // evaluation of user's answer choices & feedback
-    if (answer === event.target.textContent) {   
-        pElement.innerHTML = "YES!";
-        setTimeout(hideFeedback,1225);
-        showFeedback();   
-        
-    } else {
-        pElement.innerHTML = "WRONG.";
-        setTimeout(hideFeedback,1225);
-        secondsLeft = secondsLeft - 20;
-        showFeedback();
-    }    
-    makeQuestions();
+    var sbutton = document.createElement("button");
+    sbutton.textContent = "Submit";
+    highscores.appendChild(sbutton);
+    sbutton.addEventListener("submit", function(event) {
+        event.preventDefault();
+
+        var highscoretext = highscores.value.trim();
+
+        if (highscoretext === "") {
+            return;
+        };
+
+        scoreList.push(highscoretext);
+        enterInfo.value = "";
+    });
+};
+
+startButton.addEventListener("click", function() {
+    content.textContent = "";
+    getQuestion();
+    startTimer();    
 });
